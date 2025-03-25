@@ -77,14 +77,22 @@ Here, you will define any special terms, acronyms, or abbreviations you plan to 
 
 Here, you will define any special terms, acronyms, or abbreviations you plan to use for hardware
 
+- **DC Motor**: Spiral coil motor used for product dispensing  
+- **IR Sensor**: Infrared photodiode/phototransistor pair used to detect dropped items  
+- **Motor Driver**: L298N or ULN2003 driver IC used to interface motors with MCU  
+- **LCD**: 16x2 or TFT display module (I2C or SPI protocol)  
+- **PSU**: Power Supply Unit (12V adapter)
+
 **6.2 Functionality**
 
-| ID     | Description                                                                                                                        |
-| ------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| HRS-01 | A distance sensor shall be used for obstacle detection. The sensor shall detect obstacles at a maximum distance of at least 10 cm. |
-| HRS-02 | A noisemaker shall be inside the trap with a strength of at least 55 dB.                                                           |
-| HRS-03 | An electronic motor shall be used to reset the trap remotely and have a torque of 40 Nm in order to reset the trap mechanism.      |
-| HRS-04 | A camera sensor shall be used to capture images of the trap interior. The resolution shall be at least 480p.                       |
+| ID      | Description |
+|---------|-------------|
+| HRS-01  | The coin acceptor shall reliably accept standard coins (e.g., US quarters) with a success rate of ≥90%. Verified by testing with 10+ insertions to ensure minimal misreads or rejects. |
+| HRS-02  | The DC motor shall generate enough torque to rotate the spiral coil and dispense a snack in under 2 seconds. Torque will be measured and motor activation verified using a force gauge or oscilloscope. |
+| HRS-03  | The IR sensor shall detect dropped snacks within a 5 cm range. Detection will be tested using a test object and confirmed via firmware flag or serial output. |
+| HRS-04  | The LCD (I2C or SPI) shall operate at 5V or 3.3V logic and display text clearly within ±5% of the target contrast. Verified under normal lighting and through voltage inspection. |
+| HRS-05  | The power system shall include a 12V PSU and regulators providing stable 5V or 3.3V outputs within ±5% tolerance. Voltage levels will be confirmed with a multimeter or oscilloscope. |
+| HRS-06  | The buzzer shall output 65–75 dB at 1 ft distance to clearly alert users to errors or confirmations. Volume tested using a dB meter or smartphone app. |
 
 ### 7. Bill of Materials (BOM)
 
@@ -92,20 +100,56 @@ Here, you will define any special terms, acronyms, or abbreviations you plan to 
 
 *In addition to this written response, copy the Final Project BOM Google Sheet and fill it out with your critical components (think: processors, sensors, actuators). Include the link to your BOM in this section.*
 
+
+| Component           | Description |
+|---------------------|-------------|
+| **Microcontroller** | ATmega328P or ESP32 – Main control unit handling all logic, I/O, and timing operations |
+| **Coin Acceptor**   | Detects and validates standard coins (e.g., US quarters) for balance updates |
+| **RFID Module**     | Used to unlock the machine for authorized restocking personnel (not for user payment) |
+| **DC Motor + Driver** | Motor (e.g., spiral coil type) driven by L298N or ULN2003 IC – used for item dispensing |
+| **Infrared Sensor** | IR emitter and photodiode pair used to detect successful item drops into the bin |
+| **LCD Display + Keypad** | 16x2 or TFT LCD screen (I2C/SPI) to display balance, feedback, and errors; buttons for user interaction |
+| **Buzzer + Speaker** | Outputs 65–75 dB alerts to confirm actions, errors, or other states |
+| **Power Supply**    | 12V adapter with 5V/3.3V regulators for stable system power across modules |
+
+ A detailed BOM including part numbers, links, and pricing is maintained here:  
+[Google Sheets BOM]((https://docs.google.com/spreadsheets/d/1tD4mwFQawdeWJ-1o8tE54Ama47arEm-hpApQYBJRXLQ/edit?usp=sharing))
+
 ### 8. Final Demo Goals
 
 *How will you demonstrate your device on demo day? Will it be strapped to a person, mounted on a bicycle, require outdoor space? Think of any physical, temporal, and other constraints that could affect your planning.*
+
+#### 1. Physical Setup
+The vending machine will be placed on a tabletop with the coin acceptor, LCD display, and product selection buttons clearly visible and accessible to users.
+
+#### 2. Demonstration Flow
+- User inserts a **coin**.
+- The **LCD** updates to reflect the new balance.
+- The user **presses a button** to select a snack.
+- The **motor** activates to dispense the snack.
+- The **IR sensor** detects the snack drop and confirms delivery.
+- The **LCD** updates the inventory count.
+- A **buzzer** or **speech module** provides audible confirmation of success.
+
+#### 3. Error Cases
+- If a selected item is **out of stock**, the system will show an **error message** on the LCD and trigger a **buzzer alert**.
+- If an **invalid coin** is inserted, the system will reject it and optionally trigger a **beep**.
+
+#### 4. Wi-Fi Demo (Optional)
+- The system may optionally demonstrate **real-time or periodic posting** of inventory status to a local dashboard via Wi-Fi for restocking/logging purposes.
 
 ### 9. Sprint Planning
 
 *You've got limited time to get this project done! How will you plan your sprint milestones? How will you distribute the work within your team? Review the schedule in the final project manual for exact dates.*
 
-| Milestone  | Functionality Achieved | Distribution of Work |
-| ---------- | ---------------------- | -------------------- |
-| Sprint #1  |                        |                      |
-| Sprint #2  |                        |                      |
-| MVP Demo   |                        |                      |
-| Final Demo |                        |                      |
+| Milestone     | Functionality Achieved                                                                                      | Distribution of Work |
+|---------------|--------------------------------------------------------------------------------------------------------------|-----------------------|
+| **Sprint #1** <br> *(Week 1)* | - Hardware prototyping: wire up MCU, coin acceptor, and motor driver on breadboard  <br> - Coin interrupt testing: validate that coin insertion triggers an interrupt <br> - Basic motor control: use ISRs to rotate motor for fixed time | Jiwanshi: Breadboarding, Coin ISR <br> Jat: Motor testing |
+| **Sprint #2** <br> *(Week 2)* | - Integrate IR sensor to detect item drop <br> - Implement LCD display with I2C to show balance & item selection <br> - Add basic inventory decrement logic after dispense | Jat: IR sensor setup <br> Jiwanshi: LCD integration & inventory logic |
+| **Sprint #3** <br> *(Week 3)* | - Refine payment system to handle coin values and insufficient funds <br> - Implement RFID-based restock locking system via I2C <br> - Add speech feedback module for user alerts | Jat: Coin logic & balance update <br> Jiwanshi: RFID + speech module |
+| **MVP Demo** <br> *(End of Week 3)* | - Demonstrate coin-based purchase, dispensing, item tracking, and at least one type of feedback | Both team members present and demo respective parts |
+| **Sprint #4** <br> *(Week 4)* | - Finalize hardware enclosure and tidy up wiring <br> - Add error handling for out-of-stock and invalid coin cases <br> - Enable Wi-Fi-based inventory posting to local dashboard | Jiwanshi: Hardware polish & wiring <br> Jat: Wi-Fi logging + error messages |
+
 
 **This is the end of the Project Proposal section. The remaining sections will be filled out based on the milestone schedule.**
 
