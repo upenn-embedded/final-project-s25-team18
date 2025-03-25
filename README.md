@@ -4,7 +4,7 @@
 * Team Number: 18
 * Team Name: Team 18
 * Team Members: Jiwanshi Shah & Jat Tse
-* GitHub Repository URL:
+* GitHub Repository URL: https://github.com/upenn-embedded/final-project-s25-team18
 * GitHub Pages Website URL: [for final submission]
 
 ## Final Project Proposal 
