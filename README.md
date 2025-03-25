@@ -150,8 +150,8 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 |                | - Integrate IR sensor to detect item drop                                                                 | Jat: IR sensor setup                             |
 |                | - Implement LCD with I2C to show balance & item selection                                                 | Jiwanshi: LCD integration & inventory logic      |
 | **Sprint #2**  | - Add basic inventory decrement logic after dispense                                                      |                                                  |
-| **Sprint #2**  | - Refine payment system: handle coin values & insufficient fund                                           | Jat: Coin logic & balance update                 |
-| *(Week 2)*     | - Implement RFID-based restock locking system via I2C                                                     | Jiwanshi: RFID + speech module                   |
+|  *(Week 2)*    | - Refine payment system: handle coin values & insufficient fund                                           | Jat: Coin logic & balance update                 |
+|                | - Implement RFID-based restock locking system via I2C                                                     | Jiwanshi: RFID + speech module                   |
 |                | - Add speech feedback module for user alerts                                                              |                                                  |
 |                | - Add basic inventory decrement logic after dispense                                                      |                                                  |
 | **MVP Demo**   | - Demonstrate coin-based purchase, dispensing, item tracking, and at least one type of feedback           | Both members present and demo respective parts   |
