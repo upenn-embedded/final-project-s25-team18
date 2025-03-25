@@ -142,22 +142,22 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 
 *You've got limited time to get this project done! How will you plan your sprint milestones? How will you distribute the work within your team? Review the schedule in the final project manual for exact dates.*
 
-| Milestone      | Functionality Achieved                                                                                   | Distribution of Work                             |
+| Milestone      | Functionality Achieved                                                                                    | Distribution of Work                             |
 |----------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------------------|
-| **Sprint #1**  | - Hardware prototyping: wire up MCU, coin acceptor, and motor driver on breadboard                        | Jiwanshi: Breadboarding, Coin ISR<br>Jat: Motor testing |
-| *(Week 1)*     | - Coin interrupt testing: validate coin insertion triggers an interrupt                                   |                                                  |
+| **Sprint #1**  | - Hardware prototyping: wire up MCU, coin acceptor, and motor driver on breadboard                        | Jiwanshi: Breadboarding, Coin ISR                |
+| *(Week 1)*     | - Coin interrupt testing: validate coin insertion triggers an interrupt                                   | Jat: Motor testing                               
 |                | - Basic motor control: use ISRs to rotate motor for fixed time                                            |                                                  |
-| **Sprint #2**  | - Integrate IR sensor to detect item drop                                                                 | Jat: IR sensor setup                             |
-| *(Week 2)*     | - Implement LCD with I2C to show balance & item selection                                                 | Jiwanshi: LCD integration & inventory logic      |
-|                | - Add basic inventory decrement logic after dispense                                                      |                                                  |
-| **Sprint #3**  | - Refine payment system: handle coin values & insufficient funds                                          | Jat: Coin logic & balance update                 |
-| *(Week 3)*     | - Implement RFID-based restock locking system via I2C                                                     | Jiwanshi: RFID + speech module                   |
+|                | - Integrate IR sensor to detect item drop                                                                 | Jat: IR sensor setup                             |
+|                | - Implement LCD with I2C to show balance & item selection                                                 | Jiwanshi: LCD integration & inventory logic      |
+| **Sprint #2**  | - Add basic inventory decrement logic after dispense                                                      |                                                  |
+| **Sprint #2**  | - Refine payment system: handle coin values & insufficient fund                                           | Jat: Coin logic & balance update                 |
+| *(Week 2)*     | - Implement RFID-based restock locking system via I2C                                                     | Jiwanshi: RFID + speech module                   |
 |                | - Add speech feedback module for user alerts                                                              |                                                  |
+|                | - Add basic inventory decrement logic after dispense                                                      |                                                  |
 | **MVP Demo**   | - Demonstrate coin-based purchase, dispensing, item tracking, and at least one type of feedback           | Both members present and demo respective parts   |
-| *(End of Wk 3)*|                                                                                                           |                                                  |
 | **Final Demo** | - Finalize hardware enclosure and tidy up wiring                                                          | Jiwanshi: Hardware polish & wiring               |
-| *(Sprint #4)*  | - Add error handling: out-of-stock & invalid coin cases                                                   | Jat: Wi-Fi logging + error messages              |
-| *(Week 4)*     | - Enable Wi-Fi-based inventory posting to local dashboard                                                 |                                                  |
+|                | - Add error handling: out-of-stock & invalid coin cases                                                   | Jat: Wi-Fi logging + error messages              |
+|                | - Enable Wi-Fi-based inventory posting to local dashboard                                                 |                                                  |
 
 
 **This is the end of the Project Proposal section. The remaining sections will be filled out based on the milestone schedule.**
