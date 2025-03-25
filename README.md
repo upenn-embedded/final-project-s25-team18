@@ -1,33 +1,47 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/WXeqVgks)
 # final-project-skeleton
 
-* Team Number:
-* Team Name:
-* Team Members:
+* Team Number: 18
+* Team Name: Team 18
+* Team Members: Jiwanshi Shah & Jat Tse
 * GitHub Repository URL:
 * GitHub Pages Website URL: [for final submission]
 
-## Final Project Proposal
+## Final Project Proposal 
 
 ### 1. Abstract
 
 *In a few sentences, describe your final project.*
 
+- The Smart Snacks Vending Machine is an upgraded vending solution that accepts coins dispenses snacks via a motorized spiral mechanism, and provides inventory tracking and user feedback through an LCD and speech output. We aim to do so by leveraging serial communication (I2C/SPI), timers/interrupts, and power management. 
+
 ### 2. Motivation
 
 *What is the problem that you are trying to solve? Why is this project interesting? What is the intended purpose?*
+
+- Modern vending machines are being redesigned for greater convenience and modernization. Unlike traditional coin-operated machines that are still common, newer models now offer contactless payment options, making snack selection and communication more efficient. Accessibility and user feedback are also key features of this design, with speech output (text-to-speech) and LCD screens ensuring clear communication, especially for users with visual impairments. Additionally, inventory is tracked in real time, reducing downtime caused by stock-outs and enabling automated alerts for restocking, which enhances overall efficiency and service reliability.
 
 ### 3. System Block Diagram
 
 *Show your high level design, as done in WS1 and WS2. What are the critical components in your system? How do they communicate (I2C?, interrupts, ADC, etc.)? What power regulation do you need?*
 
+- The diagram currently shows our interest in implementing an RFID payment mechanism; however, we are going to mainly focus on accepting coins.
+  
 ### 4. Design Sketches
 
 *What will your project look like? Do you have any critical design features? Will you need any special manufacturing techniques to achieve your vision, like power tools, laser cutting, or 3D printing?*
 
+![diagram-front](https://github.com/user-attachments/assets/ab7c29f5-78b7-4a08-af13-406155cf00cd)
+
+![diagram-back](https://github.com/user-attachments/assets/facf7f82-1471-4bdf-b812-2a1f5b2bf431)
+
+We are currently planning to use cardboard to construct the vending machine as it greatly resembles a box, however we will look into the possibility of laser printing the box for a betetr experience. 
+
 ### 5. Software Requirements Specification (SRS)
 
 *Formulate key software requirements here. Think deeply on the design: What must your device do? How will you measure this during validation testing? Create 4 to 8 critical system requirements.*
+
+
 
 *These must be testable! See the Final Project Manual Appendix for details. Refer to the table below; replace these examples with your own.*
 
@@ -35,14 +49,23 @@
 
 Here, you will define any special terms, acronyms, or abbreviations you plan to use for hardware
 
+- MCU: Microcontroller Unit (ATmega328P or ESP32)
+
+- ISR: Interrupt Service Routine
+
+- RFID: Radio-Frequency Identification – used to lock/unlock the machine for authorized restocking
+
 **5.2 Functionality**
 
-| ID     | Description                                                                                                                                                                                                              |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| SRS-01 | The IMU 3-axis acceleration will be measured with 16-bit depth every 100 milliseconds +/-10 milliseconds                                                                                                                 |
-| SRS-02 | The distance sensor shall operate and report values at least every .5 seconds.                                                                                                                                           |
-| SRS-03 | Upon non-nominal distance detected (i.e., the trap mechanism has changed at least 10 cm from the nominal range), the system shall be able to detect the change and alert the user in a timely manner (within 5 seconds). |
-| SRS-04 | Upon a request from the user, the system shall get an image from the internal camera and upload the image to the user system within 10s.                                                                                 |
+| ID      | Description |
+|---------|-------------|
+| SRS-01  | **Coin Detection:** The microcontroller will detect coin insertion using an interrupt within 50 ms of the coin passing the sensor. Verified via debug logs and timing using a logic analyzer. |
+| SRS-02  | **Coin Value Reading & Balance Update:** After detecting a coin, the system will identify its value and update the user’s balance in under 1 second. Feedback will be given via LCD or buzzer. |
+| SRS-03  | **Motor Control for Dispensing:** Upon product selection, the motor will start/stop within ±100 ms to prevent double-dispensing. Timing is verified using an oscilloscope or logic analyzer. |
+| SRS-04  | **Inventory Tracking:** An IR sensor will detect when a product is dropped. The internal inventory will be updated accordingly, and a flag will be toggled in the firmware to confirm the drop. |
+| SRS-05  | **RFID for Restocking Access:** RFID will be used to unlock the machine for authorized restocking. RFID tap will be confirmed via serial logs and feedback on the LCD. |
+| SRS-06  | **User Interface (LCD Display):** The LCD will display real-time balance, product selection, and error messages. The screen will refresh at a minimum rate of 2 Hz to ensure users are kept informed. |
+
 
 ### 6. Hardware Requirements Specification (HRS)
 
