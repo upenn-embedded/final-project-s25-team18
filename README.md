@@ -27,7 +27,7 @@
 
 <img width="364" alt="image" src="https://github.com/user-attachments/assets/6b20c32a-2479-45ce-92be-4182c7cea9d5" />
 
-- The diagram currently shows our interest in implementing an RFID payment mechanism; however, we are going to mainly focus on accepting coins.
+
   
 ### 4. Design Sketches
 
