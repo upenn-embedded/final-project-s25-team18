@@ -25,6 +25,8 @@
 
 *Show your high level design, as done in WS1 and WS2. What are the critical components in your system? How do they communicate (I2C?, interrupts, ADC, etc.)? What power regulation do you need?*
 
+<img width="364" alt="image" src="https://github.com/user-attachments/assets/6b20c32a-2479-45ce-92be-4182c7cea9d5" />
+
 - The diagram currently shows our interest in implementing an RFID payment mechanism; however, we are going to mainly focus on accepting coins.
   
 ### 4. Design Sketches
