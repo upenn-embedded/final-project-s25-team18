@@ -115,7 +115,7 @@ Here, you will define any special terms, acronyms, or abbreviations you plan to 
 | **Power Supply**    | 12V adapter with 5V/3.3V regulators for stable system power across modules |
 
  A detailed BOM including part numbers, links, and pricing is maintained here:  
-[Google Sheets BOM]((https://docs.google.com/spreadsheets/d/1tD4mwFQawdeWJ-1o8tE54Ama47arEm-hpApQYBJRXLQ/edit?usp=sharing))
+(https://docs.google.com/spreadsheets/d/1iPDKnOJ7NfpnbtSCWD45nYKtOHLzh2dI/edit?usp=sharing&ouid=116562270372585393158&rtpof=true&sd=true)
 
 ### 8. Final Demo Goals
 
