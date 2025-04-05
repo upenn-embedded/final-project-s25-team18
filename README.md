@@ -173,7 +173,7 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 
 ### Current state of project
 - Continuing work on the coin acceptor.
-- Successfully integrated the RFID reader and motor with the Atmega microcontroller.
+- Successfully integrated the motor with the Atmega microcontroller and working on the RFID integration.
 - Revised the laser-cutting design.
 - Received some of the parts needed for final assembly.
 
@@ -182,6 +182,11 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 - Perform the final laser cutting of the design.
 - Incorporate the slot and slide for the coin acceptor.
 - Get the LCD module fully operational with the Atmega.
+
+- drawing:
+  
+<img width="1407" alt="image" src="https://github.com/user-attachments/assets/655de750-6d17-41db-ba5c-76c4d1a1f374" />
+
 
 ## Sprint Review #2
 
