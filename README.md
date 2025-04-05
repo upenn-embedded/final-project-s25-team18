@@ -184,7 +184,9 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 - Get the LCD module fully operational with the Atmega.
 
 - drawing:
-  
+
+![PHOTO-2025-03-30-14-33-31](https://github.com/user-attachments/assets/5c67eead-e790-4fe9-ac99-261cab17732d)
+
 <img width="1407" alt="image" src="https://github.com/user-attachments/assets/655de750-6d17-41db-ba5c-76c4d1a1f374" />
 
 
