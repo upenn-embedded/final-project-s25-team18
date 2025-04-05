@@ -167,10 +167,21 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 ## Sprint Review #1
 
 ### Last week's progress
+- Ordered all required parts and completed the drawing for laser cutting.
+- Finished Venture Labs training.
+- Wrote basic code for the coin acceptor.
 
 ### Current state of project
+- Continuing work on the coin acceptor.
+- Successfully integrated the RFID reader and motor with the Atmega microcontroller.
+- Revised the laser-cutting design.
+- Received some of the parts needed for final assembly.
 
 ### Next week's plan
+- Attach the motor to the wheel and spiral to test the dispensing mechanism.
+- Perform the final laser cutting of the design.
+- Incorporate the slot and slide for the coin acceptor.
+- Get the LCD module fully operational with the Atmega.
 
 ## Sprint Review #2
 
