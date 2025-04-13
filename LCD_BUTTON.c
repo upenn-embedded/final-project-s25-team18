@@ -29,6 +29,20 @@ void Initialize(){
     
 }
 
+bool isButtonPressed() {
+    if (!(PIND & (1 << BUTTON))) {
+        _delay_ms(20); // Wait for bouncing to settle
+        if (!(PIND & (1 << BUTTON))) {
+            while (!(PIND & (1 << BUTTON))) {
+                // Wait for button to be released
+            }
+            _delay_ms(20); // Optional: debounce on release too
+            return true;
+        }
+    }
+    return false;
+}
+
 
 
 // Step 1: Show the beginning display until keypad is pressed
@@ -47,36 +61,49 @@ int main(void) {
         snackIndex = 0;
         userBalance = 0;
         dispensed = false;
-
+        _delay_ms(2000);
+        LCD_setScreen(0xFFFF);
+        LCD_drawString(30, 50, "Please select snack", 0x0000, 0xFFFF);
+        LCD_drawString(30, 70, "By pressing keypad", 0x0000, 0xFFFF);
+        _delay_ms(5000);
         // === Step 2: Simulate user selection ===
-        _delay_ms(5000);  // Replace with actual button or keypad input later
+          // Replace with actual button or keypad input later
         
-        while (!(PIND & (1 << BUTTON))) {
+        while (!isButtonPressed()) {
             
-            _delay_ms(1000); // Simulate waiting for coin
+            // nothing
             
         }
         snackIndex = 1;
         LCD_setScreen(0xFFFF); // or just clear the area
-        LCD_drawString(30, 50, "Selected Snack", 0x0000, 0xFFFF);
+        LCD_drawString(40, 50, "Selected Snack", 0x0000, 0xFFFF);
         _delay_ms(5000);
         // TODO: Check the keypad 
 
         // === Step 3: Show snack info ===
-        displaySnackInfo(snackIndex, userBalance);
-        _delay_ms(10000);
+        if (getStock(snackIndex) > 0) {
+            displaySnackInfo(snackIndex, userBalance);
+            _delay_ms(2000);
+            LCD_setScreen(0xFFFF); // or just clear the area
+            LCD_drawString(40, 50, "Insert Coins", 0x0000, 0xFFFF);
+        } else {
+            LCD_setScreen(0xFFFF); // or just clear the area
+            LCD_drawString(40, 50, "No stock left", 0x0000, 0xFFFF);
+            LCD_drawString(20, 60, "Pick another snack", 0x0000, 0xFFFF);
+            _delay_ms(2000);
+            continue;
+        }
+        
 
         // === Step 4: Coin insertion loop ===
-        while (!(PIND & (1 << BUTTON))) {
-            _delay_ms(3000); // Simulate waiting for coin
-            LCD_setScreen(0xFFFF); // or just clear the area
-            LCD_drawString(30, 50, "Insufficient balance.", 0x0000, 0xFFFF);
+        while (!isButtonPressed()) {
+            
         }
 
         // Coin inserted, update balance
         userBalance = getPrice(snackIndex);
-        updateStock(snackIndex);
         displaySnackInfo(snackIndex, userBalance);
+        updateStock(snackIndex);
 
         _delay_ms(6000);  // Optional delay
 
@@ -92,12 +119,17 @@ int main(void) {
             
         }
         LCD_setScreen(0xFFFF);
-        LCD_drawString(20, 50, "Item Dispensed. Enjoy!", 0x0000, 0xFFFF);
+        LCD_drawString(15, 50, "Item Dispensed. Enjoy!", 0x0000, 0xFFFF);
+        LCD_drawString(80, 90, ":)", 0x0000, 0xFFFF);
 
         _delay_ms(10000);  // Wait before looping again
     }
 }
 
+        
+        
+        
+        
         
         
         
