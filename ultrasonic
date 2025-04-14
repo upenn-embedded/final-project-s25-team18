@@ -1,0 +1,213 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include "uart.h" // Assumes you have uart_init() and printf() redirected
+
+// CPU frequency
+#define F_CPU 16000000UL
+
+// ========== Pin Definitions ========== //
+#define TRIG_PIN  PB1  // PB1 -> Trigger for Ultrasonic
+#define ECHO_PIN  PB0  // PB0 -> Echo for Ultrasonic
+#define LED_PIN   PD7  // LED on PD7
+
+// ========== Timer2 Settings ========== //
+// We want an interrupt every 20 us.
+// At 16 MHz with prescaler=8, Timer2 increments every 0.5 us.
+// So for a 20 us period, we need 40 counts: OCR2A = 39 (counting from 0..39 = 40 ticks).
+#define TIMER2_OCR_VALUE  39
+
+// ========== Timer1 Settings ========== //
+// We use prescaler=256 -> each tick ~16 us at 16 MHz.
+#define TIMER1_PRESCALER     256
+// TICKS_VAL is the number of Timer1 increments per second = F_CPU / TIMER1_PRESCALER = 62500 for 16 MHz.
+#define TICKS_VAL 62500UL
+
+// ========== Speed of Sound (from snippet) ========== //
+// Snippet used #define SPEED_OF_SOUND_IN_CM_S (331/10)
+// We'll replicate it exactly:
+#define SPEED_OF_SOUND_IN_CM_S (331.0 / 10.0)  // 33.1
+
+// ========== Globals for measuring echo pulse ========== //
+volatile uint16_t ticks_t1 = 0;
+volatile uint16_t ticks_t2 = 0;
+volatile bool     got_falling_edge = false; // indicates we got a full rising->falling measurement
+
+// We'll toggle edges in the ISR, similarly to your snippet:
+typedef enum { INIT_RISING, RISING, FALLING } edge_state_t;
+volatile edge_state_t next_edge = INIT_RISING;
+
+// Timer2 interrupt cycle counter
+volatile uint16_t tick_count = 0;
+
+// ========== Prototypes ========== //
+static void init_input_capture(void);
+static void init_timer2(void);
+static float compute_distance_cm(uint16_t t1, uint16_t t2);
+
+// ========== Initialize Input Capture (Timer1) ========== //
+static void init_input_capture(void)
+{
+    // Timer1 in Normal mode, prescaler=256, noise canceller on, capture on rising edge first
+    // TCCR1A = 0 (all WGM10..WGM11 = 0)
+    TCCR1A = 0;
+    // ICNC1=1 (noise cancel), ICES1=1 (capture on rising edge), CS12=1 => prescaler=256
+    TCCR1B = (1 << ICNC1) | (1 << ICES1) | (1 << CS12);
+    TCCR1C = 0;
+
+    // Clear pending interrupts
+    TIFR1  = (1 << ICF1);
+    // Enable input capture interrupt
+    TIMSK1 = (1 << ICIE1);
+}
+
+// ========== Initialize Timer2 (for sending trig pulses) ========== //
+static void init_timer2(void)
+{
+    // CTC mode (WGM21=1), prescaler=8
+    TCCR2A = (1 << WGM21);
+    TCCR2B = (1 << CS21);
+
+    // OCR2A sets the compare value
+    OCR2A = TIMER2_OCR_VALUE; // = 39 => interrupt every 40 ticks => 20 us
+
+    // Clear interrupt flag, then enable compare match interrupt
+    TIFR2  = (1 << OCF2A);
+    TIMSK2 = (1 << OCIE2A);
+}
+
+// ========== Compute Distance in cm ========== //
+// Replicate the snippet's approach
+static float compute_distance_cm(uint16_t t1, uint16_t t2)
+{
+    float temp_us      = 0.0;
+    float distance_cm  = 0.0;
+    uint16_t elapsed_time_us;
+
+    // Handle 16-bit wrap if t2 < t1
+    if (t2 >= t1) {
+        // difference in ticks
+        temp_us = (float)(t2 - t1) / (float)TICKS_VAL;
+    } else {
+        // wrapped around
+        temp_us = (float)((65536UL - t1) + t2) / (float)TICKS_VAL;
+    }
+
+    // Now temp_us is in seconds. Multiply by 1,000,000 to get microseconds.
+    temp_us *= 1000000.0;
+
+    elapsed_time_us = (uint16_t) temp_us;
+
+    // distance = ( SPEED_OF_SOUND_IN_CM_S * elapsed_time_us ) / 2000
+    // The snippet divides by 2000, presumably to account for round-trip time * 1000
+    distance_cm = (SPEED_OF_SOUND_IN_CM_S * (float)elapsed_time_us) / 2000.0;
+
+    return distance_cm;
+}
+
+int main(void)
+{
+    // 1) Configure I/O
+    // PB1 = Trigger (output), PB0 = Echo (input)
+    DDRB  |=  (1 << TRIG_PIN);    // PB1 as output
+    PORTB &= ~(1 << TRIG_PIN);    // Low initially
+
+    DDRB  &= ~(1 << ECHO_PIN);    // PB0 as input
+    // If you need an internal pull-up, do: PORTB |= (1 << ECHO_PIN);
+
+    // LED on PD7
+    DDRD  |=  (1 << LED_PIN);
+    PORTD &= ~(1 << LED_PIN);
+
+    // 2) Initialize UART (make sure your uart.c sets up the baud rate & stdout redirection)
+    uart_init();
+
+    // 3) Initialize Timer1 (Input Capture) & Timer2 (for trigger pulses)
+    init_input_capture();
+    init_timer2();
+
+    // 4) Global interrupts ON
+    sei();
+
+    // Main loop
+    while (1)
+    {
+        // If we got a valid rising->falling measurement, compute distance
+        if (got_falling_edge)
+        {
+            got_falling_edge = false;  // reset flag
+
+            float distance = compute_distance_cm(ticks_t1, ticks_t2);
+
+            if (distance > 0.0 && distance < 1000.0)  // Arbitrary sanity limit
+            {
+                printf("Distance: %.2f cm\r\n", distance);
+
+                if (distance <= 25.0) {
+                    PORTD |= (1 << LED_PIN);  // LED ON
+                    printf("Item dispensed\r\n");
+                } else {
+                    PORTD &= ~(1 << LED_PIN); // LED OFF
+                    printf("No item dispensed\r\n");
+                }
+            }
+            else
+            {
+                PORTD &= ~(1 << LED_PIN);
+                printf("No valid reading\r\n");
+            }
+        }
+    }
+    return 0;
+}
+
+// ========== Timer1 Input Capture Interrupt ========== //
+ISR(TIMER1_CAPT_vect)
+{
+    // Read ICR1 (16-bit: ICR1H:ICR1L)
+    uint16_t capture = ICR1;
+
+    // Check which edge we just captured
+    if ((TCCR1B & (1 << ICES1)) != 0) {
+        // We just captured a RISING edge
+        ticks_t1  = capture;
+        // Next time, capture FALLING edge
+        TCCR1B &= ~(1 << ICES1);
+        next_edge = FALLING;
+    }
+    else {
+        // We just captured a FALLING edge
+        ticks_t2  = capture;
+        // Indicate we have a full measurement
+        got_falling_edge = true;
+
+        // Next time, capture RISING edge
+        TCCR1B |= (1 << ICES1);
+        next_edge = RISING;
+    }
+}
+
+// ========== Timer2 Compare Match Interrupt ========== //
+// This fires every 20 us. We use it to generate a short trigger pulse
+// on PB1 (TRIG_PIN) and repeat about every 14 ms (700 * 20 us).
+ISR(TIMER2_COMPA_vect)
+{
+    tick_count++;
+
+    // At count=1, set PB1 high
+    if (tick_count == 1) {
+        PORTB |= (1 << TRIG_PIN);
+    }
+    // At count=2, set PB1 low (=> ~20us HIGH pulse)
+    else if (tick_count == 2) {
+        PORTB &= ~(1 << TRIG_PIN);
+    }
+    // Reset every 700 counts => roughly every 14 ms
+    else if (tick_count == 700) {
+        tick_count = 0;
+    }
+}
+
