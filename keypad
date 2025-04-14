@@ -1,0 +1,151 @@
+
+#include <xc.h>
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+#include "uart.h"
+#include <stdbool.h>
+#include <string.h>
+
+// Number of rows & columns
+#define NUM_ROWS 4
+#define NUM_COLS 3
+
+// 3×4 layout (row-major):
+//    R1: 1   2   3
+//    R2: 4   5   6
+//    R3: 7   8   9
+//    R4: *   0   #
+static const char KEYS[NUM_ROWS][NUM_COLS] =
+{
+    {'1','2','3'},
+    {'4','5','6'},
+    {'7','8','9'},
+    {'*','0','#'}
+};
+
+// Row pins on PB0..PB3
+static const uint8_t rowPins[NUM_ROWS] = { PB3, PB2, PB1, PB0 };
+// Column pins on PD2..PD4
+static const uint8_t colPins[NUM_COLS] = { PD4, PD3, PD2 };
+
+// ---------------------------------------------------------------------------
+//  initIO()
+//     Sets up UART, then row pins as outputs, column pins as inputs w/ pull-ups,
+//     prints debug info on DDR and PORT registers.
+// ---------------------------------------------------------------------------
+static void initIO(void)
+{
+    // 1) Init UART (so printf works)
+    uart_init();  // Implementation depends on your setup; must set BAUD, etc.
+    _delay_ms(10);
+
+    printf("\r\n--- KEYPAD DEBUG INIT ---\r\n");
+   
+    // 2) Rows = PB0..PB3 as outputs
+    DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2) | (1 << PB3);
+    // 3) Cols = PD2..PD4 as inputs, with pull-ups
+    DDRD &= ~((1 << PD2) | (1 << PD3) | (1 << PD4));  // Input
+    PORTD |= (1 << PD2) | (1 << PD3) | (1 << PD4);    // Pull-up on
+
+    // Print initial register states (in hex) for debugging
+    printf("DDRB=0x%02X, PORTB=0x%02X\r\n", DDRB, PORTB);
+    printf("DDRD=0x%02X, PORTD=0x%02X\r\n", DDRD, PORTD);
+
+    printf("--- INIT COMPLETE ---\r\n\r\n");
+    _delay_ms(100);
+}
+
+// ---------------------------------------------------------------------------
+//  driveRow(r):
+//    - Sets all rows HIGH, then drives only row r LOW
+//    - Prints debug info about which row is driven low.
+// ---------------------------------------------------------------------------
+static void driveRow(uint8_t r)
+{
+    // Set all rows HIGH
+    PORTB |= (1 << PB0) | (1 << PB1) | (1 << PB2) | (1 << PB3);
+
+    // Now drive row r LOW
+    PORTB &= ~(1 << rowPins[r]);
+
+    // Debug: show which row we drove low
+    printf("[driveRow] Driving row %d low (PB%d), PORTB=0x%02X\r\n",
+           r, rowPins[r], PORTB);
+}
+
+// ---------------------------------------------------------------------------
+//  scanKeypad():
+//    - Goes through each row, drives that row LOW, checks columns
+//    - Returns the first pressed key's char, or 0 if none
+//    - Prints debug info about columns read, etc.
+// ---------------------------------------------------------------------------
+static char scanKeypad(void)
+{
+    for (uint8_t r = 0; r < NUM_ROWS; r++)
+    {
+        // Drive one row low, others high
+        driveRow(r);
+        _delay_us(5);  // let signals settle
+
+        // Check each column in this row
+        for (uint8_t c = 0; c < NUM_COLS; c++)
+        {
+            // We'll read PIND for that bit
+            uint8_t mask = (1 << colPins[c]);
+            uint8_t pindVal = PIND & mask;
+
+            // Debug: show column reading
+            printf("   [scanRow=%d col=%d] PIND & 0x%02X = 0x%02X\r\n",
+                   r, c, mask, pindVal);
+
+            // If pin is LOW => key pressed
+            if (pindVal == 0)
+            {
+                // Debounce
+                _delay_ms(50);
+
+                // Wait until release (optional)
+                while ((PIND & mask) == 0) {
+                    // Could do small delay here
+                }
+
+                // Return the character from our KEYS array
+                return KEYS[r][c];
+            }
+        }
+    }
+    // If we scanned all rows and found no press:
+    return 0;
+}
+
+// ---------------------------------------------------------------------------
+//  main()
+//    - Continuously scans keypad, prints "Key pressed: X" or "No key pressed."
+//    - Very spammy for debugging; adjust delay as needed.
+// ---------------------------------------------------------------------------
+int main(void)
+{
+    initIO();
+
+    while (1)
+    {
+        char key = scanKeypad();
+
+        if (key != 0)
+        {
+            // Found a key press
+            printf("Key pressed: %c\r\n", key);
+        }
+        else
+        {
+            // None pressed
+            printf("No key pressed.\r\n");
+        }
+
+        // Delay to slow down prints
+        _delay_ms(500);
+    }
+    return 0;
+}
