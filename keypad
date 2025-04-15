@@ -1,6 +1,8 @@
 
 #include <xc.h>
 #define F_CPU 16000000UL
+#define BAUD_RATE 9600
+#define BAUD_PRESCALER (((F_CPU / (BAUD_RATE * 16UL))) - 1)
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -41,7 +43,7 @@ static void initIO(void)
     uart_init();  // Implementation depends on your setup; must set BAUD, etc.
     _delay_ms(10);
 
-    printf("\r\n--- KEYPAD DEBUG INIT ---\r\n");
+    //printf("\r\n--- KEYPAD DEBUG INIT ---\r\n");
    
     // 2) Rows = PB0..PB3 as outputs
     DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2) | (1 << PB3);
@@ -50,10 +52,10 @@ static void initIO(void)
     PORTD |= (1 << PD2) | (1 << PD3) | (1 << PD4);    // Pull-up on
 
     // Print initial register states (in hex) for debugging
-    printf("DDRB=0x%02X, PORTB=0x%02X\r\n", DDRB, PORTB);
-    printf("DDRD=0x%02X, PORTD=0x%02X\r\n", DDRD, PORTD);
-
-    printf("--- INIT COMPLETE ---\r\n\r\n");
+//    printf("DDRB=0x%02X, PORTB=0x%02X\r\n", DDRB, PORTB);
+//    printf("DDRD=0x%02X, PORTD=0x%02X\r\n", DDRD, PORTD);
+//
+//    printf("--- INIT COMPLETE ---\r\n\r\n");
     _delay_ms(100);
 }
 
@@ -71,8 +73,8 @@ static void driveRow(uint8_t r)
     PORTB &= ~(1 << rowPins[r]);
 
     // Debug: show which row we drove low
-    printf("[driveRow] Driving row %d low (PB%d), PORTB=0x%02X\r\n",
-           r, rowPins[r], PORTB);
+    //printf("[driveRow] Driving row %d low (PB%d), PORTB=0x%02X\r\n",
+           //r, rowPins[r], PORTB);
 }
 
 // ---------------------------------------------------------------------------
@@ -97,8 +99,8 @@ static char scanKeypad(void)
             uint8_t pindVal = PIND & mask;
 
             // Debug: show column reading
-            printf("   [scanRow=%d col=%d] PIND & 0x%02X = 0x%02X\r\n",
-                   r, c, mask, pindVal);
+            //printf("   [scanRow=%d col=%d] PIND & 0x%02X = 0x%02X\r\n",
+                  // r, c, mask, pindVal);
 
             // If pin is LOW => key pressed
             if (pindVal == 0)
@@ -120,6 +122,27 @@ static char scanKeypad(void)
     return 0;
 }
 
+void uart_tx_init(void)
+{
+    // 1. Set baud rate
+    uint16_t ubrr = 103; // for 9600 baud @ 16MHz
+    UBRR0H = (unsigned char)(BAUD_PRESCALER >> 8);
+    UBRR0L = (unsigned char) BAUD_PRESCALER;
+
+    // 2. Set frame format: 8 data, no parity, 1 stop bit
+    // UCSZ01 and UCSZ00 = 1 => 8-bit data
+    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00); // 8-bit, no parity, 1 stop
+
+    // 3. Enable transmitter
+    UCSR0B = (1 << TXEN0);
+}
+
+void uart_send_char(char c)
+{
+    while (!(UCSR0A & (1 << UDRE0))); // Wait until buffer empty
+    UDR0 = c;                         // Send the character
+}
+
 // ---------------------------------------------------------------------------
 //  main()
 //    - Continuously scans keypad, prints "Key pressed: X" or "No key pressed."
@@ -128,6 +151,8 @@ static char scanKeypad(void)
 int main(void)
 {
     initIO();
+    uart_tx_init();
+    // Make PC0 and PC1 output pins - so we can 
 
     while (1)
     {
@@ -136,6 +161,7 @@ int main(void)
         if (key != 0)
         {
             // Found a key press
+            uart_send_char(key);
             printf("Key pressed: %c\r\n", key);
         }
         else
@@ -145,7 +171,7 @@ int main(void)
         }
 
         // Delay to slow down prints
-        _delay_ms(500);
+        _delay_ms(250);
     }
     return 0;
 }
