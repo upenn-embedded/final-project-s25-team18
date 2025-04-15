@@ -10,7 +10,7 @@
 
 #define ENTRY_SENSOR PB0  // INT0
 #define EXIT_SENSOR  PC0  // INT1
-#define BUTTON PD0
+#define BUTTON PC5
 
 volatile uint16_t start_time = 0;
 volatile uint16_t end_time = 0;
@@ -24,16 +24,16 @@ bool dispensed = false;
 
 void Initialize(){
     lcd_init();
-    DDRD &= ~(1 << BUTTON);
+    DDRC &= ~(1 << BUTTON);
     
     
 }
 
 bool isButtonPressed() {
-    if (!(PIND & (1 << BUTTON))) {
+    if (!(PINC & (1 << BUTTON))) {
         _delay_ms(20); // Wait for bouncing to settle
-        if (!(PIND & (1 << BUTTON))) {
-            while (!(PIND & (1 << BUTTON))) {
+        if (!(PINC & (1 << BUTTON))) {
+            while (!(PINC & (1 << BUTTON))) {
                 // Wait for button to be released
             }
             _delay_ms(20); // Optional: debounce on release too
