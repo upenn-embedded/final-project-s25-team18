@@ -137,11 +137,7 @@ void uart_tx_init(void)
     UCSR0B = (1 << TXEN0);
 }
 
-void uart_send_char(char c)
-{
-    while (!(UCSR0A & (1 << UDRE0))); // Wait until buffer empty
-    UDR0 = c;                         // Send the character
-}
+
 
 // ---------------------------------------------------------------------------
 //  main()
