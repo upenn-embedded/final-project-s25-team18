@@ -159,6 +159,7 @@ int main(void)
             printf("Key pressed: %c\r\n", key);
             if (key == '1') {
                 PORTC |= (1 << PC0);
+                _delay_ms(500); 
                 printf("PC0 ON: %c\r\n", key);
             }
             PORTC &= ~(1 << PC0);
