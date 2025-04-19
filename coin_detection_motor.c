@@ -86,6 +86,7 @@ void tx_uart_setup(void) {
 
     // Enable transmitter
     UCSR0B = (1 << TXEN0);
+    UCSR0B = (1 << RXEN0); // TODO: Recieve signal to choose which motor to turn on
 
     // Set frame format: 8 data bits, 1 stop bit, no parity
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
@@ -154,7 +155,9 @@ int main(void) {
 
             // === Motor Trigger ===
             if (item_count == 4 && !motor_started) {
+                // TODO: Choose which motor based on signal recieved. 
                 uart_send_int(1);
+                _delay_ms(4000);
                 motor_started = true;
                 start_motor_75();
 
