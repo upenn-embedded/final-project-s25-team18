@@ -72,7 +72,7 @@ void uart_rx_init(void)
 
     // 3. Enable transmitter
     UCSR0B = (1 << RXEN0);
-    UCSR0B = (1 << TXEN0);
+    //UCSR0B = (1 << TXEN0);
 }
 
 // Row pins on PB0..PB3
