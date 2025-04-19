@@ -41,23 +41,38 @@ static float compute_distance_cm(uint16_t t1, uint16_t t2);
 void pwm_init(void);
 void start_motor_75(void);
 void stop_motor(void);
+void start_motor2_75(void);
+void stop_motor2(void);
+
 
 // === PWM Motor Setup (Timer0 on OC0B / PD5) ===
 void pwm_init(void) {
     DDRD |= (1 << MOTOR_PIN);  // Set PD5 as output
-    TCCR0A |= (1 << COM0B1) | (1 << WGM01) | (1 << WGM00); // Fast PWM, non-inverting
+    DDRD |= (1 << PD6);
+    TCCR0A |= (1 << COM0B1) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00); // Fast PWM, non-inverting
     TCCR0B |= (1 << CS01) | (1 << CS00); // Prescaler = 64
     OCR0B = 0; // Motor off initially
+    OCR0A = 0; // Motor 2 off initially
 }
 
 void start_motor_75(void) {
     OCR0B = 191;  // 75% duty cycle (191/255)
-    printf("Motor started at 75%% speed\n");
+    printf("Motor 1 started at 75%% speed\n");
 }
 
 void stop_motor(void) {
     OCR0B = 0;
-    printf("Motor stopped\n");
+    printf("Motor 1 stopped\n");
+}
+
+void start_motor2_75(void) {
+    OCR0A = 191;  // 75% duty cycle (191/255)
+    printf("Motor 2 started at 75%% speed\n");
+}
+
+void stop_motor2(void) {
+    OCR0A = 0;
+    printf("Motor 2 stopped\n");
 }
 
 // === Input Capture Init ===
@@ -162,6 +177,10 @@ int main(void) {
                 motor_started = true;
                 
                 start_motor_75();
+                start_motor2_75();
+                if (PIND & (1 << PD6)) {
+                    printf("PD6 HIGH");
+                }
                 
                 // Run motor for 30 seconds
                 for (int i = 0; i < 300; i++) {
@@ -169,6 +188,7 @@ int main(void) {
                 }
 
                 stop_motor();
+                stop_motor2();
 
                 // === Reset logic ===
                 item_count = 0;
