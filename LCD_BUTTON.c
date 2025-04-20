@@ -251,9 +251,9 @@ int main(void) {
         
         // TODO: Also got to set up UART here 
         if (snackIndex == 0) {
-            uart_send_int(0);
-        } else {
             uart_send_int(1);
+        } else {
+            uart_send_int(2);
         }
         
         
