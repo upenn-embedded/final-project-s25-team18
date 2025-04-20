@@ -71,7 +71,7 @@ void uart_rx_init(void)
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00); // 8-bit, no parity, 1 stop
 
     // 3. Enable transmitter
-    UCSR0B = (1 << RXEN0);
+    UCSR0B = (1 << TXEN0) | (1 << RXEN0);
     //UCSR0B = (1 << TXEN0);
 }
 
