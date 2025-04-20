@@ -250,11 +250,7 @@ int main(void) {
         
         
         // TODO: Also got to set up UART here 
-        if (snackIndex == 0) {
-            uart_send_int(1);
-        } else {
-            uart_send_int(2);
-        }
+    
         
         
         // INPUT PIN TO CHECK IF COIN INSERTING IS DONE - PC0
@@ -264,6 +260,11 @@ int main(void) {
             if (uart_receive_int() == 1) {
                 coinDetection = true;
             }
+        }
+        if (snackIndex == 0) {
+            uart_send_int(1);
+        } else if (snackIndex == 1) {
+            uart_send_int(2);
         }
 
         // Coin inserted, update balance
