@@ -33,6 +33,7 @@ volatile uint16_t tick_count = 0;
 uint8_t item_count = 0;
 bool object_in_front = false;
 bool motor_started = false;
+int motor_id = 0;
 
 // === Function Prototypes ===
 static void init_input_capture(void);
@@ -101,7 +102,7 @@ void tx_uart_setup(void) {
 
     // Enable transmitter
     UCSR0B = (1 << TXEN0);
-    //UCSR0B = (1 << RXEN0); // TODO: Recieve signal to choose which motor to turn on
+    UCSR0B = (1 << RXEN0); // TODO: Recieve signal to choose which motor to turn on
 
     // Set frame format: 8 data bits, 1 stop bit, no parity
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
@@ -143,6 +144,12 @@ int main(void) {
 
     while (1) {
         
+        if (uart_receive_int() == 1) {
+            motor_id = 1;
+        } else if (uart_receive_int() == 2) {
+            motor_id = 2;
+        }
+        
         if (got_falling_edge) {
             got_falling_edge = false;
 
@@ -167,6 +174,14 @@ int main(void) {
                 printf("Invalid reading\n");
                 object_in_front = false;
             }
+            
+           
+            
+            
+            
+            
+            
+            
 
             // === Motor Trigger ===
             if (item_count == 4 && !motor_started) {
@@ -176,8 +191,13 @@ int main(void) {
                 _delay_ms(80000);
                 motor_started = true;
                 
-                start_motor_75();
-                start_motor2_75();
+                if (motor_id == 1) {
+                    start_motor_75();
+                } else if (motor_id == 2) {
+                    start_motor2_75();
+                }
+                
+              
                 if (PIND & (1 << PD6)) {
                     printf("PD6 HIGH");
                 }
@@ -186,9 +206,13 @@ int main(void) {
                 for (int i = 0; i < 300; i++) {
                     _delay_ms(100);
                 }
-
-                stop_motor();
-                stop_motor2();
+                
+                if (motor_id == 1) {
+                    stop_motor();
+                } else if (motor_id == 2) {
+                    stop_motor2();
+                }
+              
 
                 // === Reset logic ===
                 item_count = 0;
