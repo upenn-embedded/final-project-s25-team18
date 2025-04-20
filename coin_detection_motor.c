@@ -101,8 +101,7 @@ void tx_uart_setup(void) {
     UBRR0L = ubrr;
 
     // Enable transmitter
-    UCSR0B = (1 << TXEN0);
-    UCSR0B = (1 << RXEN0); // TODO: Recieve signal to choose which motor to turn on
+    UCSR0B = (1 << TXEN0) | (1 << RXEN0); // TODO: Recieve signal to choose which motor to turn on
 
     // Set frame format: 8 data bits, 1 stop bit, no parity
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
@@ -144,10 +143,13 @@ int main(void) {
 
     while (1) {
         
-        if (uart_receive_int() == 1) {
-            motor_id = 1;
-        } else if (uart_receive_int() == 2) {
-            motor_id = 2;
+        if (uart_data_available()) {
+            uint8_t received = uart_receive_int(); // or uart_receive_byte()
+            if (received == 1) {
+                motor_id = 1;
+            } else if (received == 2) {
+                motor_id = 2;
+            }
         }
         
         if (got_falling_edge) {
