@@ -143,15 +143,6 @@ int main(void) {
 
     while (1) {
         
-        if (uart_data_available()) {
-            uint8_t received = uart_receive_int(); // or uart_receive_byte()
-            if (received == 1) {
-                motor_id = 1;
-            } else if (received == 2) {
-                motor_id = 2;
-            }
-        }
-        
         if (got_falling_edge) {
             got_falling_edge = false;
 
@@ -190,7 +181,20 @@ int main(void) {
                 // TODO: Choose which motor based on signal recieved.
                 
                 uart_send_int(1);
-                _delay_ms(80000);
+
+                printf("Waiting for motor ID...\n");
+
+                // Wait until motor_id becomes valid (1 or 2)
+                while (motor_id == 0) {
+                    if (uart_data_available()) {
+                        uint8_t received = uart_receive_int();
+                        if (received == 1 || received == 2) {
+                            motor_id = received;
+                            printf("Motor ID received: %d\n", motor_id);
+                        }
+                    }
+                }
+                _delay_ms(50000);
                 motor_started = true;
                 
                 if (motor_id == 1) {
