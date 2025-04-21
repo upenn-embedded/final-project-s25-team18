@@ -27,6 +27,7 @@ int userBalance = 0;
 bool dispensed = false;
 bool coinDetection = false;
 bool waitingForMotorRequest = true;
+bool motorPicked = false;
 char key;
 
 static const char KEYS[NUM_ROWS][NUM_COLS] =
@@ -271,7 +272,13 @@ int main(void) {
                     printf("received 2");
                     // Got signal from motor ATmega, send motor ID
                     _delay_ms(100);  // ensure the other side is ready
-                    uart_send_int(snackIndex == 0 ? 1 : 2);
+                    while (!motorPicked) {
+                        uart_send_int(snackIndex == 0 ? 1 : 2);
+                        if (uart_recieve_int() == 3) {
+                            motorPicked = true;
+                        }
+                    }
+                    
                     printf("sent motor signal");
                     waitingForMotorRequest = false;
                 }
