@@ -201,7 +201,8 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 ## MVP Demo
 
 1. Show a system block diagram & explain the hardware implementation.
-   ![IMG_0300](https://github.com/user-attachments/assets/4f164a34-c9f6-4787-8f61-85ecc4746e8a)
+ ![IMG_0300](https://github.com/user-attachments/assets/45c5a913-141c-4e08-a29a-cc9ff248643b)
+
 
 3. Explain your firmware implementation, including application logic and critical drivers you've written.
 4. Demo your device.
