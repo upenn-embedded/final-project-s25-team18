@@ -6,7 +6,8 @@
 #include "uart2.h"
 
 #define F_CPU 16000000UL
-
+#define BAUD_RATE 9600
+#define BAUD_PRESCALER (((F_CPU / (BAUD_RATE * 16UL))) - 1)
 // === Pin Definitions ===
 #define TRIG_PIN  PB1
 #define ECHO_PIN  PB0
@@ -97,8 +98,8 @@ static void init_timer2(void) {
 void tx_uart_setup(void) {
     // Set baud rate
     uint16_t ubrr = 103; // 9600 baud @ 16MHz
-    UBRR0H = (ubrr >> 8);
-    UBRR0L = ubrr;
+    UBRR0H = (unsigned char)(BAUD_PRESCALER >> 8);
+    UBRR0L = (unsigned char) BAUD_PRESCALER;
 
     // Enable transmitter
     UCSR0B = (1 << TXEN0) | (1 << RXEN0); // TODO: Recieve signal to choose which motor to turn on
@@ -181,6 +182,8 @@ int main(void) {
                 // TODO: Choose which motor based on signal recieved.
                 
                 uart_send_int(1);
+                _delay_ms(100);
+                uart_send_int(2); // Ask for motor ID
 
                 printf("Waiting for motor ID...\n");
 
@@ -264,3 +267,4 @@ ISR(TIMER2_COMPA_vect) {
         tick_count = 0; // ~50ms trigger interval
     }
 }
+     
