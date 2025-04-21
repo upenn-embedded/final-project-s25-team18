@@ -205,8 +205,10 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 
 
 3. Explain your firmware implementation, including application logic and critical drivers you've written.
-4. Demo your device.
-5. Have you achieved some or all of your Software Requirements Specification (SRS)?
+   - The basic functioning of the current system is that the LCD prompts the user to select a snack by pressing te keypad. Once the keypad is pressed it detects the number pressed and outputs the snack selected, its stock, and the current coin balance in the system. Then it prompts the user to insert the coins which are detcted using an ultrasonic sensor that updates the number of quarters that passed until it equals the amount needed for the snack. Once achieved, the LCD outputs "Sufficient Balance" and trigger the respective motor to start. It dispenses a snack which is detected by an ultrasonic sensor and once verified the motor stops. The LCD outputs snack dispensed and thank you and resets. 
+     
+5. Demo your device.
+6. Have you achieved some or all of your Software Requirements Specification (SRS)?
    1. Show how you collected data and the outcomes.
       
 | ID     | Description |
