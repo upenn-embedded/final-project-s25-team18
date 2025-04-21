@@ -266,7 +266,7 @@ int main(void) {
                     printf("received 1\n");
                     coinDetection = true;
         
-                    // ✅ Send back ACK (value 100)
+                    // Send back ACK (value 100)
                     uart_send_int(100);
                 }
             }
