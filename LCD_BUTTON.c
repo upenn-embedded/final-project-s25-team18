@@ -259,6 +259,7 @@ int main(void) {
         while (coinDetection == false) {
             printf("coin detection false");
             if (uart_receive_int() == 1) {
+                printf("received 1");
                 coinDetection = true;
             }
         }
@@ -267,9 +268,11 @@ int main(void) {
              if (uart_data_available()) {
                 uint8_t request = uart_receive_int();
                 if (request == 2) {
+                    printf("received 2");
                     // Got signal from motor ATmega, send motor ID
                     _delay_ms(100);  // ensure the other side is ready
                     uart_send_int(snackIndex == 0 ? 1 : 2);
+                    printf("sent motor signal");
                     waitingForMotorRequest = false;
                 }
             }
