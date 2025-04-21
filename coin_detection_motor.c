@@ -199,6 +199,8 @@ int main(void) {
                         }
                     }
                 }
+                uart_send_int(3);
+
                 _delay_ms(50000);
                 
                 
