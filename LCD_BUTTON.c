@@ -258,10 +258,17 @@ int main(void) {
         // INPUT PIN TO CHECK IF COIN INSERTING IS DONE - PC0
         // === Step 4: Coin insertion loop ===
         while (coinDetection == false) {
-            printf("coin detection false");
-            if (uart_receive_int() == 1) {
-                printf("received 1");
-                coinDetection = true;
+            printf("Waiting for coin insert signal...\n");
+
+            if (uart_data_available()) {
+                uint8_t val = uart_receive_int();
+                if (val == 1) {
+                    printf("received 1\n");
+                    coinDetection = true;
+        
+                    // ✅ Send back ACK (value 100)
+                    uart_send_int(100);
+                }
             }
         }
         // motor request
