@@ -195,11 +195,13 @@ int main(void) {
                     }
                 }
                 _delay_ms(50000);
-                motor_started = true;
+                
                 
                 if (motor_id == 1) {
+                    motor_started = true;
                     start_motor_75();
                 } else if (motor_id == 2) {
+                    motor_started = true;
                     start_motor2_75();
                 }
                 
