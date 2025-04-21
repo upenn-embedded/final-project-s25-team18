@@ -204,16 +204,36 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 2. Explain your firmware implementation, including application logic and critical drivers you've written.
 3. Demo your device.
 4. Have you achieved some or all of your Software Requirements Specification (SRS)?
-
    1. Show how you collected data and the outcomes.
+| ID      | Description |
+|---------|-------------|
+| SRS-01  | **Coin Detection:** The microcontroller will detect coin insertion using an interrupt within 20 ms of the coin passing the ultrasonicsensor. Verified via debug logs and timing. We used UART to output diatnce and if a coin was detected and kept a counter to show how many and reset it after every motor movement. |
+| SRS-02  | **Coin Value Reading & Balance Update:** After detecting a coin, the system will update the user’s balance in under 1 second until sufficient balance is met. If the balance is not sufficient after 1 minute+ then the LCD will output insufficient balance until more coins are inserted. Feedback is be given via LCD and the motor turning. |
+| SRS-03  | **Motor Control for Dispensing:** Upon product selection, the motor will start/stop within ±30s to prevent double-dispensing. We will also be controlling the motor by making it stop once a snack is detected. We verified the motor spinning using oscilloscopes as well as the time of it spinning. |
+| SRS-04  | **Inventory Tracking:** A ultrasonic sensor detects when a product is dropped. There are two such set-up with each having a slot in the laser cut part. The internal inventory is updated accordingly. We tested this by using UART to detect the distance and delays.|
+| SRS-04  | **User Interface (LCD Display):** The LCD displays real-time balance, product selection, and error messages. |
+
 5. Have you achieved some or all of your Hardware Requirements Specification (HRS)?
-
    1. Show how you collected data and the outcomes.
+
+| ID      | Description |
+|---------|-------------|
+| HRS-01  | The coin acceptor reliably accept standard coins (e.g., US quarters) with a success rate of ≥90%. Verified by testing with 10+ insertions to ensure minimal misreads or rejects. Also tested on ramp and confirmed the speed of the coin and the diatnce detection with UART |
+| HRS-02  | The DC motor generates enough torque to rotate the spiral coil connected to the wheel and dispense a snack in for 30 seconds. Torque was be measured and motor activation verified using an oscilloscope. We also placed a product in the spiral to ensure that the weight was okay. |
+| HRS-03  | The ultrasonic sensors detect dropped snacks within a 5 cm range. Detection was tested using a test object and confirmed via serial output. |
+| HRS-04  | The LCD operates at 5V and displays text clearly within ±5% of the target contrast. |
+| HRS-05  | The power system shall include a 6V PSU and regulators providing stable 5V and 6V outputs within ±5% tolerance. Voltage levels were confirmed with a multimeter |
+| HRS-06  | The speaker is still pending to be integrated. |
+
 6. Show off the remaining elements that will make your project whole: mechanical casework, supporting graphical user interface (GUI), web portal, etc.
-7. What is the riskiest part remaining of your project?
+   - Attaching all laser cut parts and emebedding all the parts into their respective places. Getting the motor to stop upon snack drop detection. Implementing the speaker and audio feedback and integrating into the whole circuit.
+8. What is the riskiest part remaining of your project?
+   - The Speaker and Audio Feedback will be the most trickest part as we are still working on it. 
 
    1. How do you plan to de-risk this?
-8. What questions or help do you need from the teaching team?
+  - Get started on it as soon as possible and test multiple times before integrating it into the circuit. 
+10. What questions or help do you need from the teaching team?
+    - NA. We had issues getting both Atmegas to work at the same time but we are figuring it out. 
 
 ## Final Project Report
 
