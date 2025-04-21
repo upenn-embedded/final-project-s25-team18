@@ -180,9 +180,11 @@ int main(void) {
             // === Motor Trigger ===
             if (item_count == 4 && !motor_started) {
                 // TODO: Choose which motor based on signal recieved.
-                
+
+                printf("sent 1");
                 uart_send_int(1);
                 _delay_ms(100);
+                printf("sent 2");
                 uart_send_int(2); // Ask for motor ID
 
                 printf("Waiting for motor ID...\n");
