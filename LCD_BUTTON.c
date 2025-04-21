@@ -26,6 +26,7 @@ int snackIndex = 0;
 int userBalance = 0;
 bool dispensed = false;
 bool coinDetection = false;
+bool waitingForMotorRequest = true;
 char key;
 
 static const char KEYS[NUM_ROWS][NUM_COLS] =
@@ -261,11 +262,23 @@ int main(void) {
                 coinDetection = true;
             }
         }
-        if (snackIndex == 0) {
-            uart_send_int(1);
-        } else if (snackIndex == 1) {
-            uart_send_int(2);
+        // motor request
+        while (waitingForMotorRequest) {
+             if (uart_data_available()) {
+                uint8_t request = uart_receive_int();
+                if (request == 2) {
+                    // Got signal from motor ATmega, send motor ID
+                    _delay_ms(100);  // ensure the other side is ready
+                    uart_send_int(snackIndex == 0 ? 1 : 2);
+                    waitingForMotorRequest = false;
+                }
+            }
         }
+        // if (snackIndex == 0) {
+        //     uart_send_int(1);
+        // } else if (snackIndex == 1) {
+        //     uart_send_int(2);
+        // }
 
         // Coin inserted, update balance
         userBalance = getPrice(snackIndex);
