@@ -207,13 +207,15 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 4. Demo your device.
 5. Have you achieved some or all of your Software Requirements Specification (SRS)?
    1. Show how you collected data and the outcomes.
-| ID      | Description |
-|---------|-------------|
-| SRS-01  | **Coin Detection:** The microcontroller will detect coin insertion using an interrupt within 20 ms of the coin passing the ultrasonicsensor. Verified via debug logs and timing. We used UART to output diatnce and if a coin was detected and kept a counter to show how many and reset it after every motor movement. |
-| SRS-02  | **Coin Value Reading & Balance Update:** After detecting a coin, the system will update the user’s balance in under 1 second until sufficient balance is met. If the balance is not sufficient after 1 minute+ then the LCD will output insufficient balance until more coins are inserted. Feedback is be given via LCD and the motor turning. |
-| SRS-03  | **Motor Control for Dispensing:** Upon product selection, the motor will start/stop within ±30s to prevent double-dispensing. We will also be controlling the motor by making it stop once a snack is detected. We verified the motor spinning using oscilloscopes as well as the time of it spinning. |
-| SRS-04  | **Inventory Tracking:** A ultrasonic sensor detects when a product is dropped. There are two such set-up with each having a slot in the laser cut part. The internal inventory is updated accordingly. We tested this by using UART to detect the distance and delays.|
-| SRS-04  | **User Interface (LCD Display):** The LCD displays real-time balance, product selection, and error messages. |
+      
+| ID     | Description |
+|--------|-------------|
+| **SRS–01** | **Coin Detection:** The microcontroller will detect coin insertion using an interrupt within 20 ms of the coin passing the ultrasonic sensor. Verified via debug logs and timing. We used UART to output distance and if a coin was detected, and kept a counter to show how many coins were inserted, resetting it after each motor movement. |
+| **SRS–02** | **Coin Value Reading & Balance Update:** After detecting a coin, the system will update the user’s balance in under 1 second until sufficient balance is met. If the balance is not sufficient after 1+ minute, the LCD will display an “insufficient balance” message. Feedback is provided via both the LCD and the motor. |
+| **SRS–03** | **Motor Control for Dispensing:** Upon product selection, the motor will start/stop within ±30s to prevent double dispensing. We verified motor spinning using oscilloscopes and timed the spin. The motor is also controlled to stop once a snack is detected. |
+| **SRS–04** | **Inventory Tracking:** An ultrasonic sensor detects when a product is dropped. There are two such setups, each with a slot in the laser-cut part. Inventory is updated accordingly. This was tested using UART to monitor distance and delays. |
+| **SRS–05** | **User Interface (LCD Display):** The LCD displays real-time balance, product selection options, and error messages. |
+
 
 5. Have you achieved some or all of your Hardware Requirements Specification (HRS)?
    1. Show how you collected data and the outcomes.
