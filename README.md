@@ -201,9 +201,11 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 ## MVP Demo
 
 1. Show a system block diagram & explain the hardware implementation.
-2. Explain your firmware implementation, including application logic and critical drivers you've written.
-3. Demo your device.
-4. Have you achieved some or all of your Software Requirements Specification (SRS)?
+   ![IMG_0300](https://github.com/user-attachments/assets/4f164a34-c9f6-4787-8f61-85ecc4746e8a)
+
+3. Explain your firmware implementation, including application logic and critical drivers you've written.
+4. Demo your device.
+5. Have you achieved some or all of your Software Requirements Specification (SRS)?
    1. Show how you collected data and the outcomes.
 | ID      | Description |
 |---------|-------------|
