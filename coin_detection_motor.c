@@ -34,6 +34,7 @@ volatile uint16_t tick_count = 0;
 uint8_t item_count = 0;
 bool object_in_front = false;
 bool motor_started = false;
+bool quarterReceived = false;
 int motor_id = 0;
 int numberQuarters = 0;
 
@@ -144,9 +145,18 @@ int main(void) {
     sei();
 
     while (1) {
-        if (uart_data_avaliable()){
-            numberQuarters = uart_receive_int();
+        while (!quarterReceived) {
+            printf("quarter not received \n");
+            if (uart_data_avaliable()){
+                numberQuarters = uart_receive_int();
+                uart_send_int(1); // for ack
+                quarterReceived = true;
+                printf("quarter received \n");
+            }
+            
         }
+
+        
         
         if (got_falling_edge) {
             got_falling_edge = false;
