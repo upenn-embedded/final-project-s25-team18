@@ -281,7 +281,7 @@ int main(void) {
                     _delay_ms(100);  // ensure the other side is ready
                     while (!motorPicked) {
                         uart_send_int(snackIndex == 0 ? 1 : 2);
-                        if (uart_recieve_int() == 3) {
+                        if (uart_receive_int() == 3) {
                             motorPicked = true;
                         }
                     }
@@ -292,6 +292,7 @@ int main(void) {
                 }
             }
         }
+        waitingForMotorRequest = true;
         // if (snackIndex == 0) {
         //     uart_send_int(1);
         // } else if (snackIndex == 1) {
