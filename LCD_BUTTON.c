@@ -24,10 +24,12 @@ int i = 0;
 char buffer[16]; // Make sure this buffer is large enough
 int snackIndex = 0;
 int userBalance = 0;
+int numberQuarters = 0;
 bool dispensed = false;
 bool coinDetection = false;
 bool waitingForMotorRequest = true;
 bool motorPicked = false;
+bool quartersRecieved = false;
 char key;
 
 static const char KEYS[NUM_ROWS][NUM_COLS] =
@@ -198,6 +200,8 @@ int main(void) {
         key = 0;
         dispensed = false;
         coinDetection = false;
+        quartersRecieved = false;
+        numberQuarters = 0;
         _delay_ms(2500);
         LCD_setScreen(0xFFFF);
         LCD_drawString(30, 50, "Please select snack", 0x0000, 0xFFFF);
@@ -245,6 +249,21 @@ int main(void) {
             _delay_ms(2000);
             continue;
         }
+
+        // Going to send the quarters here 
+        numberQuarters = getPrice(snackIndex) / 0.25;
+        while (!quartersRecieved) {
+            uart_send_int(numberQuarters);
+            if (uart_data_avaliable()) {
+                uint8_t rec = uart_receive_int();
+                if (rec == 1) {
+                    printf("rec 1 \n");
+                    quartersRecieved = true;
+                }
+            }    
+        }
+        
+
         
         // MOTOR ATMEGA OUTPUT PIN, 
         // Need to check snackIndex first, send 
