@@ -155,6 +155,7 @@ int main(void) {
             }
             
         }
+        
 
         
         
@@ -264,6 +265,7 @@ int main(void) {
                 object_in_front = false;
                 motor_id = 0;
                 numberQuarters = 0;
+                quarterReceived = false;
                 printf("Counter reset after motor spin. Ready for new items!\n");
             }
 
