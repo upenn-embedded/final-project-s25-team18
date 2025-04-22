@@ -287,6 +287,7 @@ int main(void) {
                     }
                     
                     printf("sent motor signal");
+                    motorPicked = false;
                     waitingForMotorRequest = false;
                 }
             }
