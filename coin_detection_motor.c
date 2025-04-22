@@ -183,6 +183,17 @@ int main(void) {
 
                 printf("sent 1");
                 uart_send_int(1);
+                
+                bool ack_received = false;
+                while (!ack_received) {
+                    if (uart_data_available()) {
+                        uint8_t ack = uart_receive_int();
+                        if (ack == 100) { // arbitrary handshake value
+                            ack_received = true;
+                            printf("ACK from LCD received\n");
+                        }
+                    }
+                }
                 _delay_ms(100);
                 printf("sent 2");
                 uart_send_int(2); // Ask for motor ID
@@ -191,6 +202,8 @@ int main(void) {
 
                 // Wait until motor_id becomes valid (1 or 2)
                 while (motor_id == 0) {
+                    uart_send_int(2);
+                    _delay_ms(50);
                     if (uart_data_available()) {
                         uint8_t received = uart_receive_int();
                         if (received == 1 || received == 2) {
@@ -224,8 +237,10 @@ int main(void) {
                 
                 if (motor_id == 1) {
                     stop_motor();
+                    //motor_id = 0;
                 } else if (motor_id == 2) {
                     stop_motor2();
+                    //motor_id = 0;
                 }
               
 
@@ -233,6 +248,7 @@ int main(void) {
                 item_count = 0;
                 motor_started = false;
                 object_in_front = false;
+                motor_id = 0;
                 printf("Counter reset after motor spin. Ready for new items!\n");
             }
 
@@ -272,3 +288,4 @@ ISR(TIMER2_COMPA_vect) {
     }
 }
      
+
