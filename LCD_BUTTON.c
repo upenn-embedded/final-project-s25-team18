@@ -30,6 +30,7 @@ bool coinDetection = false;
 bool waitingForMotorRequest = true;
 bool motorPicked = false;
 bool quartersRecieved = false;
+bool atmegaReadyRecieve = false;
 char key;
 
 static const char KEYS[NUM_ROWS][NUM_COLS] =
@@ -201,6 +202,7 @@ int main(void) {
         dispensed = false;
         coinDetection = false;
         quartersRecieved = false;
+        atmegaReadyRecieve = false;
         numberQuarters = 0;
         _delay_ms(2500);
         LCD_setScreen(0xFFFF);
@@ -253,8 +255,19 @@ int main(void) {
         // Going to send the quarters here 
         numberQuarters = getPrice(snackIndex) / 0.25;
         while (!quartersRecieved) {
+            while(!atmegaReadyRecieve) {
+                uart_send_int(50); // ack that its going to send 
+                if (uart_data_available()) {
+                    uint8_t rec1 = uart_receive_int();
+                    if (rec1 == 25) {
+                        atmegaReadyRecieve = true;
+                    }
+
+                }
+            }
+            
             uart_send_int(numberQuarters);
-            if (uart_data_avaliable()) {
+            if (uart_data_available()) {
                 uint8_t rec = uart_receive_int();
                 if (rec == 1) {
                     printf("rec 1 \n");
