@@ -35,6 +35,7 @@ uint8_t item_count = 0;
 bool object_in_front = false;
 bool motor_started = false;
 int motor_id = 0;
+int numberQuarters = 0;
 
 // === Function Prototypes ===
 static void init_input_capture(void);
@@ -143,6 +144,9 @@ int main(void) {
     sei();
 
     while (1) {
+        if (uart_data_avaliable()){
+            numberQuarters = uart_receive_int();
+        }
         
         if (got_falling_edge) {
             got_falling_edge = false;
@@ -178,7 +182,7 @@ int main(void) {
             
 
             // === Motor Trigger ===
-            if (item_count == 4 && !motor_started) {
+            if (item_count == numberQuarters && !motor_started) {
                 // TODO: Choose which motor based on signal recieved.
 
                 printf("sent 1");
@@ -249,6 +253,7 @@ int main(void) {
                 motor_started = false;
                 object_in_front = false;
                 motor_id = 0;
+                numberQuarters = 0;
                 printf("Counter reset after motor spin. Ready for new items!\n");
             }
 
