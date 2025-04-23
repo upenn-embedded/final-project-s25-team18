@@ -176,6 +176,25 @@ static char scanKeypad(void)
     return 0;
 }
 
+void send_quarters(uint8_t snackIndex) {
+    uint8_t numberQuarters = getPrice(snackIndex) / 0.25;
+    
+    while (!quartersRecieved) {
+        // Wait for ATmega to be ready to receive
+        uart_send_int(50);  // Signal that we're about to send data
+        if (uart_data_available() && uart_receive_int() == 25) {
+            // Send the number of quarters
+            uart_send_int(numberQuarters);
+            
+            // Wait for acknowledgement
+            if (uart_data_available() && uart_receive_int() == 1) {
+                printf("Quarters acknowledged by ATmega\n");
+                quartersRecieved = true;
+            }
+        }
+    }
+}
+
 
 
 
@@ -253,28 +272,7 @@ int main(void) {
         }
 
         // Going to send the quarters here 
-        numberQuarters = getPrice(snackIndex) / 0.25;
-        while (!quartersRecieved) {
-            while(!atmegaReadyRecieve) {
-                uart_send_int(50); // ack that its going to send 
-                if (uart_data_available()) {
-                    uint8_t rec1 = uart_receive_int();
-                    if (rec1 == 25) {
-                        atmegaReadyRecieve = true;
-                    }
-
-                }
-            }
-            
-            uart_send_int(numberQuarters);
-            if (uart_data_available()) {
-                uint8_t rec = uart_receive_int();
-                if (rec == 1) {
-                    printf("rec 1 \n");
-                    quartersRecieved = true;
-                }
-            }    
-        }
+        send_quarters(snackIndex);
         
 
         
