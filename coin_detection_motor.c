@@ -256,11 +256,15 @@ int main(void) {
                 // }
 
                 while (!snackDispensed) {
+                    printf("snack not dispensed \n");
                     if (uart_data_available()) {
                         uint8_t snackRec = uart_receive_int();
+                        printf("uart rec \n");
                         if (snackRec == 30) {
                             snackDispensed = true;
+                            printf("snack dispensed \n");
                         }
+                        
 
                     }
                       
