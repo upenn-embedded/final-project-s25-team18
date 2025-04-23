@@ -4,6 +4,27 @@
 // Number of rows & columns
 #define NUM_ROWS 1
 #define NUM_COLS 3
+
+// TRIG1, ECHO1
+#define TRIG1_PIN PC4
+#define ECHO1_PIN PC5
+
+// TRIG2, ECHO2
+#define TRIG2_PIN PD3
+#define ECHO2_PIN PD4
+
+// Speed of sound = 0.0331 cm/us
+#define SOUND_SPEED_CM_PER_US 0.0331
+
+// Ultrasonic trigger pulse and timeout
+#define TRIGGER_PULSE_US 10
+#define MAX_ECHO_WAIT_US 25000  // Timeout threshold (~8 ft)
+
+// Distance threshold for detection
+#define DETECTION_THRESHOLD_CM 5.0
+
+
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -25,6 +46,8 @@ char buffer[16]; // Make sure this buffer is large enough
 int snackIndex = 0;
 int userBalance = 0;
 int numberQuarters = 0;
+float distance1 = 50;
+float distance2 = 50;
 bool dispensed = false;
 bool coinDetection = false;
 bool waitingForMotorRequest = true;
@@ -47,8 +70,56 @@ void Initialize(){
     lcd_init();
     DDRD &= ~(1 << BUTTON);
     
+    // Set trigger pins as output
+    DDRD |= (1 << TRIG1_PIN) | (1 << TRIG2_PIN);
+    PORTD &= ~((1 << TRIG1_PIN) | (1 << TRIG2_PIN));
+
+    // Set echo pins as input
+    DDRD &= ~((1 << ECHO1_PIN) | (1 << ECHO2_PIN));
+    PORTD &= ~((1 << ECHO1_PIN) | (1 << ECHO2_PIN));  // No pull-ups
+    
     
 }
+
+// ========== Send Trigger Pulse ========== //
+void trigger_sensor(uint8_t trig_pin) {
+    PORTD |= (1 << trig_pin);
+    _delay_us(TRIGGER_PULSE_US);
+    PORTD &= ~(1 << trig_pin);
+}
+
+// ========== Measure Distance (in cm) ========== //
+float get_distance(uint8_t trig_pin, uint8_t echo_pin) {
+    trigger_sensor(trig_pin);
+
+    uint32_t count = 0;
+
+    // Wait for echo to go HIGH (start pulse)
+    while (!(PIND & (1 << echo_pin))) {
+        if (++count > MAX_ECHO_WAIT_US) return -1.0;
+        _delay_us(1);
+    }
+
+    count = 0;
+    // Measure HIGH duration (pulse width)
+    while (PIND & (1 << echo_pin)) {
+        if (++count > MAX_ECHO_WAIT_US) return -1.0;
+        _delay_us(1);
+    }
+
+    // Convert time to distance (cm)
+    float distance = (count * SOUND_SPEED_CM_PER_US) / 2.0;
+    return distance;
+}
+
+
+
+
+
+
+
+
+
 
 bool isButtonPressed() {
     if (!(PIND & (1 << BUTTON))) {
@@ -176,24 +247,22 @@ static char scanKeypad(void)
     return 0;
 }
 
-// void send_quarters(uint8_t snackIndex) {
-//     uint8_t numberQuarters = getPrice(snackIndex) / 0.25;
+ void send_quarters(uint8_t snackIndex) {
+     uint8_t numberQuarters = getPrice(snackIndex) / 0.25;
     
-//     while (!quartersRecieved) {
-//         // Wait for ATmega to be ready to receive
-//         uart_send_int(50);  // Signal that we're about to send data
-//         if (uart_data_available() && uart_receive_int() == 25) {
-//             // Send the number of quarters
-//             uart_send_int(numberQuarters);
+     while (!quartersRecieved) {
+         // Wait for ATmega to be ready to receive
+        // Send the number of quarters
+        uart_send_int(numberQuarters);
             
-//             // Wait for acknowledgement
-//             if (uart_data_available() && uart_receive_int() == 1) {
-//                 printf("Quarters acknowledged by ATmega\n");
-//                 quartersRecieved = true;
-//             }
-//         }
-//     }
-// }
+        if (uart_data_available() && uart_receive_int() == 1) {
+                 printf("Quarters acknowledged by ATmega\n");
+                 quartersRecieved = true;
+        }
+             
+         
+     }
+ }
 
 
 
@@ -272,7 +341,7 @@ int main(void) {
         }
 
         // Going to send the quarters here 
-        // send_quarters(snackIndex);
+        send_quarters(snackIndex);
         
 
         
@@ -341,12 +410,27 @@ int main(void) {
         _delay_ms(2000);
 
         // === Step 5: Dispense snack ===
+        // TODO: Dispensed = true when ultrasonic detects snack dispensed
+        // Send a uart with a specific value when its detected the snack so motor stops 
         while (!dispensed) {
             dispenseSnack(snackIndex);
+            distance1 = get_distance(TRIG1_PIN, ECHO1_PIN);
+            distance2 = get_distance(TRIG2_PIN, ECHO2_PIN);
+            if (distance1 < 0 && distance2 < 0) {
+                printf("invalid reading \n");
+            } else if (distance1 <= DETECTION_THRESHOLD_CM || distance2 <= DETECTION_THRESHOLD_CM) {
+                printf("snack dispensed \n");
+                dispensed = true;
+                uart_send_int(30); // send to tell atmega snack dispensed.
+            } else {
+                printf("%s: No object detected \r\n");
+            }
             _delay_ms(2000);
-            dispensed = true; // Replace with IR sensor check in final
+            
             
         }
+        dispensed = false;
+        
         LCD_setScreen(0xFFFF);
         LCD_drawString(15, 50, "Item Dispensed. Enjoy!", 0x0000, 0xFFFF);
         LCD_drawString(80, 90, ":)", 0x0000, 0xFFFF);
