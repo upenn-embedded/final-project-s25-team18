@@ -148,7 +148,7 @@ int main(void) {
     while (1) {
         while (!quarterReceived) {
             printf("quarter not received \n");
-            if (uart_data_avaliable()){
+            if (uart_data_available()){
                 uint8_t rec_data = uart_receive_int();
                 if (rec_data == 6 || rec_data == 8) {
                     numberQuarters = rec_data;
