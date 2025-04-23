@@ -35,6 +35,7 @@ uint8_t item_count = 0;
 bool object_in_front = false;
 bool motor_started = false;
 bool quarterReceived = false;
+bool snackDispensed = false;
 int motor_id = 0;
 int numberQuarters = 0;
 
@@ -250,9 +251,23 @@ int main(void) {
                 }
                 
                 // Run motor for 30 seconds
-                for (int i = 0; i < 300; i++) {
-                    _delay_ms(100);
+                // for (int i = 0; i < 300; i++) {
+                //     _delay_ms(100);
+                // }
+
+                while (!snackDispensed) {
+                    if (uart_data_available()) {
+                        uint8_t snackRec = uart_receive_int();
+                        if (snackRec == 30) {
+                            snackDispensed = true;
+                        }
+
+                    }
+                      
                 }
+                snackDispensed = false;
+
+
                 
                 if (motor_id == 1) {
                     stop_motor();
