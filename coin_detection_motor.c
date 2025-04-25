@@ -150,7 +150,7 @@ int main(void) {
             printf("quarter not received \n");
             if (uart_data_available()){
                 uint8_t rec_data = uart_receive_int();
-                if (rec_data == 6 || rec_data == 8) {
+                if (rec_data == 3 || rec_data == 4) {
                     numberQuarters = rec_data;
                     uart_send_int(1); // for ack
                     quarterReceived = true;
