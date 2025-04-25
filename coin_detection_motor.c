@@ -19,7 +19,7 @@
 #define TICKS_VAL         62500UL
 
 #define SPEED_OF_SOUND_IN_CM_S (331.0 / 10.0)
-#define DETECTION_THRESHOLD_CM 5.0
+#define DETECTION_THRESHOLD_CM 3.0
 
 // === Globals ===
 volatile uint16_t ticks_t1 = 0;
