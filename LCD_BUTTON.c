@@ -6,15 +6,15 @@
 #define NUM_COLS 3
 
 // TRIG1, ECHO1
-#define TRIG1_PIN PC4
-#define ECHO1_PIN PC5
+#define TRIG1_PIN PD7
+#define ECHO1_PIN PD5
 
 // TRIG2, ECHO2
-#define TRIG2_PIN PD3
-#define ECHO2_PIN PD4
+#define TRIG2_PIN PD4
+#define ECHO2_PIN PD2
 
 // Speed of sound = 0.0331 cm/us
-#define SOUND_SPEED_CM_PER_US 0.0331
+#define SOUND_SPEED_CM_PER_US 0.0343
 
 // Ultrasonic trigger pulse and timeout
 #define TRIGGER_PULSE_US 10
@@ -35,7 +35,7 @@
 
 
 
-#define BUTTON PD2
+//#define BUTTON PD2
 
 
 
@@ -46,8 +46,8 @@ char buffer[16]; // Make sure this buffer is large enough
 int snackIndex = 0;
 int userBalance = 0;
 int numberQuarters = 0;
-float distance1 = 50;
-float distance2 = 50;
+float distance1 = 0;
+float distance2 = 0;
 bool dispensed = false;
 bool coinDetection = false;
 bool waitingForMotorRequest = true;
@@ -68,7 +68,7 @@ static const char KEYS[NUM_ROWS][NUM_COLS] =
 
 void Initialize(){
     lcd_init();
-    DDRD &= ~(1 << BUTTON);
+    //DDRD &= ~(1 << BUTTON);
     
     // Set trigger pins as output
     DDRD |= (1 << TRIG1_PIN) | (1 << TRIG2_PIN);
@@ -96,6 +96,7 @@ float get_distance(uint8_t trig_pin, uint8_t echo_pin) {
 
     // Wait for echo to go HIGH (start pulse)
     while (!(PIND & (1 << echo_pin))) {
+        
         if (++count > MAX_ECHO_WAIT_US) return -1.0;
         _delay_us(1);
     }
@@ -103,6 +104,7 @@ float get_distance(uint8_t trig_pin, uint8_t echo_pin) {
     count = 0;
     // Measure HIGH duration (pulse width)
     while (PIND & (1 << echo_pin)) {
+       
         if (++count > MAX_ECHO_WAIT_US) return -1.0;
         _delay_us(1);
     }
@@ -120,20 +122,20 @@ float get_distance(uint8_t trig_pin, uint8_t echo_pin) {
 
 
 
-
-bool isButtonPressed() {
-    if (!(PIND & (1 << BUTTON))) {
-        _delay_ms(20); // Wait for bouncing to settle
-        if (!(PIND & (1 << BUTTON))) {
-            while (!(PIND & (1 << BUTTON))) {
-                // Wait for button to be released
-            }
-            _delay_ms(20); // Optional: debounce on release too
-            return true;
-        }
-    }
-    return false;
-}
+//
+//bool isButtonPressed() {
+//    if (!(PIND & (1 << BUTTON))) {
+//        _delay_ms(20); // Wait for bouncing to settle
+//        if (!(PIND & (1 << BUTTON))) {
+//            while (!(PIND & (1 << BUTTON))) {
+//                // Wait for button to be released
+//            }
+//            _delay_ms(20); // Optional: debounce on release too
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 void uart_rx_init(void)
 {
@@ -292,6 +294,9 @@ int main(void) {
         quartersRecieved = false;
         atmegaReadyRecieve = false;
         numberQuarters = 0;
+        distance1 = 500;
+        
+       
         _delay_ms(2500);
         LCD_setScreen(0xFFFF);
         LCD_drawString(30, 50, "Please select snack", 0x0000, 0xFFFF);
@@ -415,17 +420,22 @@ int main(void) {
         while (!dispensed) {
             dispenseSnack(snackIndex);
             distance1 = get_distance(TRIG1_PIN, ECHO1_PIN);
-            distance2 = get_distance(TRIG2_PIN, ECHO2_PIN);
-            if (distance1 < 0 && distance2 < 0) {
-                printf("invalid reading \n");
-            } else if (distance1 <= DETECTION_THRESHOLD_CM || distance2 <= DETECTION_THRESHOLD_CM) {
-                printf("snack dispensed \n");
-                dispensed = true;
-                uart_send_int(30); // send to tell atmega snack dispensed.
+            //distance2 = get_distance(TRIG2_PIN, ECHO2_PIN);
+            printf("distance1 %f: \n", distance1);
+            printf("distance2 %f: \n", distance2);
+            if ((distance1 >= 0.0 && distance1 < 15.0)) {
+                if ((distance1 <= DETECTION_THRESHOLD_CM && distance1 >= 0.0)) {
+                    printf("within threshold \n");
+                    dispensed = true;
+                    uart_send_int(30);
+                } else {
+                    printf("object too far \n");
+                }
             } else {
-                printf("%s: No object detected \r\n");
+                printf("invalid reading \n");
             }
-            _delay_ms(2000);
+            
+            _delay_ms(1500);
             
             
         }
@@ -439,7 +449,6 @@ int main(void) {
     }
 }
 
-        
         
         
         
