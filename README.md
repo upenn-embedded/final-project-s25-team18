@@ -149,17 +149,18 @@ The vending machine will be placed on a tabletop with the coin acceptor, LCD dis
 | **Sprint #1**  | - Hardware prototyping: wire up MCU, coin acceptor, and motor driver on breadboard                        | Jiwanshi: Breadboarding, Coin ISR                |
 | *(Week 1)*     | - Coin interrupt testing: validate coin insertion triggers an interrupt                                   | Jat: Motor testing                               
 |                | - Basic motor control: use ISRs to rotate motor for fixed time                                            |                                                  |
-|                | - Integrate IR sensor to detect item drop                                                                 | Jat: IR sensor setup                             |
-|                | - Implement LCD with I2C to show balance & item selection                                                 | Jiwanshi: LCD integration & inventory logic      |
+|                | - Integrate ultrasonic sensor to detect item drop                                                         | Jat: Sensor setup                             |
+|                | - Implement LCD with I2C to show balance & item selection                                                 | Jat: LCD integration & inventory logic      |
 | **Sprint #2**  | - Add basic inventory decrement logic after dispense                                                      |                                                  |
 |  *(Week 2)*    | - Refine payment system: handle coin values & insufficient fund                                           | Jat: Coin logic & balance update                 |
 |                | - Implement RFID-based restock locking system via I2C                                                     | Jiwanshi: RFID + speech module                   |
-|                | - Add speech feedback module for user alerts                                                              |                                                  |
-|                | - Add basic inventory decrement logic after dispense                                                      |                                                  |
+                                            |
+|                | - Add basic inventory decrement logic after dispense                                                      | Jat                                                 |
 | **MVP Demo**   | - Demonstrate coin-based purchase, dispensing, item tracking, and at least one type of feedback           | Both members present and demo respective parts   |
 | **Final Demo** | - Finalize hardware enclosure and tidy up wiring                                                          | Jiwanshi: Hardware polish & wiring               |
-|                | - Add error handling: out-of-stock & invalid coin cases                                                   | Jat: Wi-Fi logging + error messages              |
-|                | - Enable Wi-Fi-based inventory posting to local dashboard                                                 |                                                  |
+|                | - Add error handling: out-of-stock & invalid coin cases                                                   | Jat: Error messages              
+|
+|                | - Putting the vending machine together                                                                    | Jiwanshi: Wiring
 
 
 **This is the end of the Project Proposal section. The remaining sections will be filled out based on the milestone schedule.**
